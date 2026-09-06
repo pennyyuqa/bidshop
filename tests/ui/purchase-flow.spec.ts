@@ -1,12 +1,13 @@
 import { test, expect } from '@playwright/test';
+import { API_BASE_URL } from '../config';
 
 test('should complete the purchase flow', async ({ page, request }) => {
   const email = `user_${Date.now()}@example.com`;
   const password = 'secret1';
 
   // Prepare an existing user through API
-  await request.post('http://localhost:4000/auth/register', {
-    data: {
+  await request.post(`${API_BASE_URL}/auth/register`, {
+    data: {          
       email,
       password,
       name: 'Test User',
@@ -14,7 +15,7 @@ test('should complete the purchase flow', async ({ page, request }) => {
   });
 
   // Login
-  await page.goto('http://localhost:5173/login');
+  await page.goto('/login');
 
   await page.getByTestId('login-email').fill(email);
   await page.getByTestId('login-password').fill(password);
