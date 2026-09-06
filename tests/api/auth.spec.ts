@@ -41,4 +41,54 @@ test.describe('Auth API', () => {
 
     expect(response.status()).toBe(409);
   });
+
+  test('should login with valid credentials', async ({ request }) => {
+  const email = `user_${Date.now()}@example.com`;
+
+  const user = {
+    email,
+    password: 'secret1',
+    name: 'Test User',
+  };
+
+  await request.post(`${API_BASE_URL}/auth/register`, {
+    data: user,
+  });
+
+  const response = await request.post(`${API_BASE_URL}/auth/login`, {
+    data: {
+      email,
+      password: 'secret1',
+    },
+  });
+
+  expect(response.status()).toBe(200);
+
+  const body = await response.json();
+
+  expect(body.token).toBeTruthy();
+  });
+
+  test('should reject login with invalid password', async ({ request }) => {
+  const email = `user_${Date.now()}@example.com`;
+
+  const user = {
+    email,
+    password: 'secret1',
+    name: 'Test User',
+  };
+
+  await request.post(`${API_BASE_URL}/auth/register`, {
+    data: user,
+  });
+
+  const response = await request.post(`${API_BASE_URL}/auth/login`, {
+    data: {
+      email,
+      password: 'wrong-password',
+    },
+  });
+
+  expect(response.status()).toBe(401);
+  });
 });
