@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-const API_BASE_URL = 'http://localhost:4000';
+import { API_BASE_URL } from '../config';
 
 test('should return the seeded product catalogue', async ({ request }) => {
   const response = await request.get(`${API_BASE_URL}/products`);
