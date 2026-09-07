@@ -67,6 +67,12 @@ deduction after ordering. I would also add one additional browser, introduce
 schema/contract checks against the OpenAPI document, and extract repeated API
 setup into typed fixtures.
 
+### Bonus feature plan
+
+See [`DISCOUNT.md`](DISCOUNT.md) for the product questions, proposed pricing
+model, implementation impact, test strategy, and rollout plan for the suggested
+10% order discount feature.
+
 No application source files were changed as part of the test implementation.
 
 ---
