@@ -101,3 +101,86 @@ test('successful order is accurately recorded', async ({ request }) => {
   const productAfter = await productAfterResponse.json();
   expect(productAfter.stock).toBe(productBefore.stock - quantity);
 });
+
+test("rejected order does not lose the customer's cart or mutate stock", async ({
+  request,
+}) => {
+  const { token, email } = await createAuthenticatedUser(request);
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
+  const productId = 'p-017';
+  const quantity = 2;
+
+  const productBeforeResponse = await request.get(
+    `${API_BASE_URL}/products/${productId}`,
+  );
+  expect(productBeforeResponse.status()).toBe(200);
+
+  const productBefore = await productBeforeResponse.json();
+  expect(productBefore.stock).toBeGreaterThanOrEqual(quantity);
+
+  const cartResponse = await request.post(`${API_BASE_URL}/cart/items`, {
+    headers,
+    data: {
+      productId,
+      quantity,
+    },
+  });
+  expect(cartResponse.status()).toBe(201);
+
+  const ordersBeforeResponse = await request.get(`${API_BASE_URL}/orders`, {
+    headers,
+  });
+  expect(ordersBeforeResponse.status()).toBe(200);
+
+  const ordersBefore = await ordersBeforeResponse.json();
+
+  const rejectedOrderResponse = await request.post(`${API_BASE_URL}/orders`, {
+    headers,
+    data: {
+      customer: {
+        name: 'Test User',
+        email,
+        address: '1 Queen Street',
+        city: 'Auckland',
+        postcode: 'invalid',
+      },
+    },
+  });
+  expect(rejectedOrderResponse.status()).toBe(400);
+  expect(await rejectedOrderResponse.json()).toEqual({
+    error: 'postcode must be a 4-digit NZ postcode',
+  });
+
+  const cartAfterResponse = await request.get(`${API_BASE_URL}/cart`, {
+    headers,
+  });
+  expect(cartAfterResponse.status()).toBe(200);
+
+  const cartAfter = await cartAfterResponse.json();
+  expect(cartAfter.items).toHaveLength(1);
+  expect(cartAfter.items[0]).toEqual(
+    expect.objectContaining({
+      productId,
+      quantity,
+    }),
+  );
+
+  const productAfterResponse = await request.get(
+    `${API_BASE_URL}/products/${productId}`,
+  );
+  expect(productAfterResponse.status()).toBe(200);
+
+  const productAfter = await productAfterResponse.json();
+  expect(productAfter.stock).toBe(productBefore.stock);
+
+  const ordersAfterResponse = await request.get(`${API_BASE_URL}/orders`, {
+    headers,
+  });
+  expect(ordersAfterResponse.status()).toBe(200);
+
+  const ordersAfter = await ordersAfterResponse.json();
+  expect(ordersAfter.count).toBe(ordersBefore.count);
+  expect(ordersAfter.items).toEqual(ordersBefore.items);
+});
