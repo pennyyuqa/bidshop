@@ -47,3 +47,33 @@ implications.
 `tests/api/cart.spec.ts` checks the documented 15% rate and currently fails on
 the cart response. The product source has deliberately not been changed as
 part of this candidate submission.
+
+## BIDSHOP-002: Multiple product images do not load
+
+**Status:** Open
+
+**Severity:** Medium
+
+**Area:** Product catalogue
+
+### Summary
+
+The product catalogue renders broken images for `p-003` (Bluff Oysters),
+`p-010` (Puhoi Valley Greek Yoghurt), and `p-012` (Sourdough Ciabatta). The
+product names and other catalogue information remain visible, but the
+configured external image URLs do not produce usable images in the UI.
+
+### Actual result
+
+The browser displays image alt text and empty image areas for the affected
+products.
+
+### Expected result
+
+Every product card should display its configured product image successfully.
+
+### Automated evidence
+
+`tests/ui/smoke.spec.ts` records the rendered natural width for each known
+affected image and reports every image whose width is zero. The assertion is
+marked as an expected failure until the product image URLs are corrected.
