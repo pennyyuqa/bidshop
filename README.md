@@ -1,9 +1,80 @@
 # Bidshop – Bidfood SDET Technical Test
 
+## Candidate submission
+
+This submission adds a small, risk-focused automated test suite for both the
+Express API and the React customer journey.
+
+### Framework choice
+
+I chose [Playwright](https://playwright.dev/) for both API and UI testing. It
+provides a single TypeScript toolchain, built-in HTTP and browser fixtures,
+automatic waiting, isolated browser contexts, useful failure artefacts, and
+straightforward CI integration. Using one runner also keeps installation,
+configuration and reporting simple for a deliberately small exercise.
+
+The tests are separated by responsibility:
+
+- `tests/api` covers authentication, the product catalogue, cart pricing and
+  order creation through HTTP requests.
+- `tests/ui` covers catalogue availability and the customer's critical
+  login-to-purchase journey in Chromium.
+- `tests/auth-helper.ts` creates independent users through the API so tests do
+  not depend on pre-existing accounts.
+
+### Install and run
+
+Prerequisite: Node.js 18 or newer. From a clean checkout, run:
+
+```bash
+npm ci
+npm ci --prefix backend
+npm ci --prefix frontend
+npx playwright install chromium
+```
+
+Playwright starts the backend and frontend automatically, so no separate
+terminal or manual server startup is required.
+
+```bash
+npm test              # run all API and UI tests
+npm run test:api      # run API tests only
+npm run test:ui       # run UI tests only
+npm run test:headed   # run with a visible browser (useful for debugging)
+npm run test:report   # open the most recent HTML report
+```
+
+The default UI target is Chromium. On CI, failed tests are retried twice and
+the HTML report is uploaded as an artefact. Traces are captured on the first
+retry, while screenshots and videos are retained on failure.
+
+### Known product issue
+
+The cart pricing test currently exposes a GST inconsistency: the documented
+rate is 15% and order creation applies 15%, but the cart API applies 12.5%.
+This is intentionally recorded rather than fixed because the exercise asks
+candidates not to change product source unless necessary. See
+[`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) for reproduction details and impact.
+
+### Trade-offs and next steps
+
+The suite prioritises a few high-value customer and API paths over exhaustive
+coverage. It currently targets one browser and uses the application's in-memory
+store rather than adding reset or seeding endpoints. With more time I would add
+focused validation for unauthorised access, invalid quantities, insufficient
+stock, empty-cart checkout, pricing consistency, cart clearing and stock
+deduction after ordering. I would also add one additional browser, introduce
+schema/contract checks against the OpenAPI document, and extract repeated API
+setup into typed fixtures.
+
+No application source files were changed as part of the test implementation.
+
+---
+
 Welcome! This repository is a small two-service application that mimics the
 sort of food-supply e-commerce site Bidfood runs. It intentionally ships with
-**no automated tests** – the goal of the exercise is for you to design and
-build a test suite that you would be comfortable owning in production.
+an application for which candidates design and build a test suite they would
+be comfortable owning in production.
 
 The stack:
 

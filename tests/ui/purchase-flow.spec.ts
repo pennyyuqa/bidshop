@@ -1,18 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { API_BASE_URL } from '../config';
+import { createAuthenticatedUser } from '../auth-helper';
 
 test('should complete the purchase flow', async ({ page, request }) => {
-  const email = `user_${Date.now()}@example.com`;
-  const password = 'secret1';
-
-  // Prepare an existing user through API
-  await request.post(`${API_BASE_URL}/auth/register`, {
-    data: {          
-      email,
-      password,
-      name: 'Test User',
-    },
-  });
+  const { email, password } = await createAuthenticatedUser(request);
 
   // Login
   await page.goto('/login');

@@ -1,25 +1,17 @@
 import { test, expect } from '@playwright/test';
 import { API_BASE_URL } from '../config';
+import { createAuthenticatedUser } from '../auth-helper';
 
 test('should place an order from the current cart', async ({ request }) => {
-  const email = `user_${Date.now()}@example.com`;
-
-  const registerResponse = await request.post(`${API_BASE_URL}/auth/register`, {
-    data: {
-      email,
-      password: 'secret1',
-      name: 'Test User',
-    },
-  });
-
-  const registerBody = await registerResponse.json();
-  const token = registerBody.token;
+  const { token, email } = await createAuthenticatedUser(request);
 
   const productsResponse = await request.get(`${API_BASE_URL}/products`);
+  expect(productsResponse.status()).toBe(200);
+
   const productsBody = await productsResponse.json();
   const product = productsBody.items[0];
 
-  await request.post(`${API_BASE_URL}/cart/items`, {
+  const cartResponse = await request.post(`${API_BASE_URL}/cart/items`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -28,6 +20,8 @@ test('should place an order from the current cart', async ({ request }) => {
       quantity: 1,
     },
   });
+
+  expect(cartResponse.status()).toBe(201);
 
   const response = await request.post(`${API_BASE_URL}/orders`, {
     headers: {
