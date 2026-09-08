@@ -28,6 +28,9 @@ needs to agree on the expected behaviour below.
 10. If price or stock changes during checkout, should the order be recalculated
     or rejected for customer confirmation?
 11. How should refunds and order amendments treat the original discount?
+12. Are there defined performance targets for cart recalculation and checkout
+    after the discount is introduced, such as expected response times, peak
+    request volume, or maximum cart size?
 
 ## Expected product impact to confirm
 
