@@ -18,6 +18,10 @@ jobs:
         npm ci
         npm ci --prefix backend
         npm ci --prefix frontend
+    - name: Typecheck backend
+      run: npm run typecheck --prefix backend
+    - name: Build frontend
+      run: npm run build --prefix frontend
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
