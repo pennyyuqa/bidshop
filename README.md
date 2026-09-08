@@ -22,16 +22,20 @@ The tests are separated by responsibility:
 - `tests/auth-helper.ts` creates independent users through the API so tests do
   not depend on pre-existing accounts.
 
-### Why shared hooks are not used
+### Keeping the framework simple
 
-The tests do not use a shared `beforeEach` because they need different setup.
-For example, some tests need one user, some need two users, and catalogue tests
-do not need a user at all.
+I aim to avoid over-engineering the test framework. Helpers, fixtures, and
+shared hooks are introduced only when they reduce meaningful duplication or
+make the tests easier to maintain.
 
-Each test creates only the data it needs. This makes the test easier to
-understand and prevents tests from affecting each other when they run in
-parallel. Small helper functions are still used to avoid repeating common API
-steps.
+For example, the tests do not use a shared `beforeEach` because they need
+different setup. Some tests need one user, some need two users, and catalogue
+tests do not need a user at all. Each test therefore creates only the data it
+needs, which keeps its prerequisites visible and prevents unnecessary setup.
+
+A small authentication helper is still used because user creation is repeated
+across several tests and extracting it improves readability without hiding the
+test's business setup.
 
 ### Install and run
 
