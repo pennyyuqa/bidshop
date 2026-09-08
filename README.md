@@ -37,6 +37,27 @@ A small authentication helper is still used because user creation is repeated
 across several tests and extracting it improves readability without hiding the
 test's business setup.
 
+### Reliable setup and state validation
+
+Setup API calls assert their expected status before their response data is
+used: registering a user must return `201`, retrieving a product must return
+`200`, and adding an item to the cart must return `201`. If a prerequisite
+fails, the test therefore reports that failure immediately instead of
+continuing with invalid data and failing later for a misleading reason.
+
+Pricing assertions verify the complete relationship from `unitPrice × quantity`
+to `lineTotal` and `subtotal`, then from the documented GST rate to `gst` and
+`total`. Expected currency values are rounded to two decimal places before
+comparison.
+
+The critical UI journey creates its independent user through the API, while
+login, adding the product, checkout, and confirmation remain browser actions.
+This keeps data preparation fast while preserving coverage of customer-facing
+behaviour. Tests that mutate inventory also use different stable product IDs
+where practical: the successful order test uses `p-018`, the rejected order
+test uses `p-017`, the inventory boundary test uses `p-015`, and the UI journey
+uses `p-001`. This reduces accidental stock interference during parallel runs.
+
 ### Install and run
 
 Prerequisite: Node.js 18 or newer. From a clean checkout, run:
