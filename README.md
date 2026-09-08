@@ -22,6 +22,17 @@ The tests are separated by responsibility:
 - `tests/auth-helper.ts` creates independent users through the API so tests do
   not depend on pre-existing accounts.
 
+### Why shared hooks are not used
+
+The tests do not use a shared `beforeEach` because they need different setup.
+For example, some tests need one user, some need two users, and catalogue tests
+do not need a user at all.
+
+Each test creates only the data it needs. This makes the test easier to
+understand and prevents tests from affecting each other when they run in
+parallel. Small helper functions are still used to avoid repeating common API
+steps.
+
 ### Install and run
 
 Prerequisite: Node.js 18 or newer. From a clean checkout, run:
@@ -53,9 +64,11 @@ retry, while screenshots and videos are retained on failure.
 The cart pricing test currently exposes a GST inconsistency: the documented
 rate is 15% and order creation applies 15%, but the cart API applies 12.5%.
 This is intentionally recorded rather than fixed because the exercise asks
-candidates not to change product source unless necessary. UI checks also record
-the catalogue's known broken external product images. See
-[`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) for reproduction details and impact.
+candidates not to change product source unless necessary. Exploratory testing
+also identified broken external product images; this is documented but excluded
+from the core CI suite because third-party image availability is a noisy,
+non-critical release signal. See [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) for
+reproduction details, impact, and the automation decision.
 
 ### Risk-based coverage
 

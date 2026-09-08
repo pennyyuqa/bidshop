@@ -72,8 +72,16 @@ products.
 
 Every product card should display its configured product image successfully.
 
-### Automated evidence
+### Reproduction and automation decision
 
-`tests/ui/smoke.spec.ts` records the rendered natural width for each known
-affected image and reports every image whose width is zero. The assertion is
-marked as an expected failure until the product image URLs are corrected.
+Open the product catalogue and inspect the cards for `p-003`, `p-010`, and
+`p-012`. The browser renders their alt text instead of usable images; the same
+URLs can also be checked directly in the product API response.
+
+This issue is deliberately not part of the core Playwright quality gate. The
+assets are hosted by a third party, so checking them on every change would add
+an external network dependency and could create failures unrelated to the
+Bidshop release. Image availability is also less critical than catalogue,
+pricing, inventory, and ordering behaviour. In production, it would be better
+covered by controlled asset hosting with a fallback image and a non-blocking
+scheduled asset-health check.
