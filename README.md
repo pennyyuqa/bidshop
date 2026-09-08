@@ -48,24 +48,50 @@ The default UI target is Chromium. On CI, failed tests are retried twice and
 the HTML report is uploaded as an artefact. Traces are captured on the first
 retry, while screenshots and videos are retained on failure.
 
-### Known product issue
+### Known product issues
 
 The cart pricing test currently exposes a GST inconsistency: the documented
 rate is 15% and order creation applies 15%, but the cart API applies 12.5%.
 This is intentionally recorded rather than fixed because the exercise asks
-candidates not to change product source unless necessary. See
+candidates not to change product source unless necessary. UI checks also record
+the catalogue's known broken external product images. See
 [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) for reproduction details and impact.
 
-### Trade-offs and next steps
+### Risk-based coverage
 
-The suite prioritises a few high-value customer and API paths over exhaustive
-coverage. It currently targets one browser and uses the application's in-memory
-store rather than adding reset or seeding endpoints. With more time I would add
-focused validation for unauthorised access, invalid quantities, insufficient
-stock, empty-cart checkout, pricing consistency, cart clearing and stock
-deduction after ordering. I would also add one additional browser, introduce
-schema/contract checks against the OpenAPI document, and extract repeated API
-setup into typed fixtures.
+I prioritised risks that could prevent a customer from ordering, corrupt an
+order, or create a financial, fulfilment, or privacy incident.
+
+| Risk | Why it matters | Automated layer |
+|---|---|---|
+| Order lost or corrupted | Protects the core business promise | API + one UI journey |
+| Cart/order price mismatch | Creates financial and customer-trust risk | API |
+| Stock incorrectly mutated | Can cause fulfilment failures | API |
+| Cross-customer data exposure | Creates a security and privacy incident | API |
+| Catalogue unavailable | Prevents customers from starting an order | Smoke UI |
+
+### Deliberate trade-offs
+
+- **One browser:** Chromium is sufficient to prove the critical business flow
+  for this time-boxed exercise. Cross-browser coverage would be added according
+  to production usage and risk rather than by default.
+- **API-heavy coverage:** Pricing boundaries, state integrity, inventory, and
+  customer isolation are faster and more deterministic at the API layer. The UI
+  suite keeps one representative purchase journey instead of duplicating every
+  API scenario.
+- **GST source unchanged:** The tests preserve the documented 15% expectation
+  and record the current 12.5% cart defect as an expected failure. Changing the
+  product implementation would blur the boundary between finding a defect and
+  fixing it in this test-focused submission.
+- **Focused validation:** I did not add a large matrix of input-validation
+  permutations. Within the time box, successful and rejected order integrity,
+  stock boundaries, pricing, and data isolation provide stronger customer and
+  business confidence.
+- **No performance test:** Performance testing is outside the requested
+  deliverables, and no workload model, service-level objective, or target
+  environment was provided. A useful extension would first agree those inputs,
+  then measure representative catalogue, cart, and checkout workloads rather
+  than run an arbitrary load test.
 
 ### Bonus feature plan
 
