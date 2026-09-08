@@ -1,7 +1,20 @@
-import { APIRequestContext, expect } from '@playwright/test';
+import { expect, type APIRequestContext } from '@playwright/test';
 import { API_BASE_URL } from './config';
 
-export async function createAuthenticatedUser(request: APIRequestContext) {
+interface AuthenticatedUser {
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  };
+  email: string;
+  password: string;
+}
+
+export async function createAuthenticatedUser(
+  request: APIRequestContext,
+): Promise<AuthenticatedUser> {
   const email = `user_${Date.now()}_${Math.random()}@example.com`;
   const password = 'secret1';
   const name = 'Test User';
