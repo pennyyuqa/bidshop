@@ -35,7 +35,7 @@ integration.
 
 ## Install and run
 
-Prerequisites: Node.js 20.x, npm, and Git.
+Prerequisites: Node.js 20 or newer, npm, and Git.
 
 ### 1. Clone the repository and enter its root directory
 
@@ -47,10 +47,11 @@ cd bidshop
 All commands below must be run from this root directory—the directory containing
 `package.json`, `playwright.config.ts`, `backend/`, `frontend/`, and `tests/`.
 
-### 2. Select Node.js 20
+### 2. Check the Node.js version
 
-This repository includes an `.nvmrc` file so local development and CI use the
-same Node.js major version. If you use `nvm`, run:
+Node.js 20 is the minimum supported version and is used in CI. Newer Node.js
+versions can also be used locally. This repository includes an `.nvmrc` file
+for selecting Node.js 20 with `nvm`:
 
 ```bash
 nvm install
@@ -58,8 +59,8 @@ nvm use
 node --version
 ```
 
-The reported version should start with `v20`. If you do not use `nvm`, install
-Node.js 20.x with your preferred version manager or the official installer.
+The reported version should be `v20` or newer. If you do not use `nvm`, run
+`node --version` directly and install Node.js 20 or newer only if required.
 
 ### 3. Install dependencies
 
