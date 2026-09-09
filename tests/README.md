@@ -35,18 +35,55 @@ integration.
 
 ## Install and run
 
-Prerequisite: Node.js 18 or newer. From a clean checkout at the repository root,
-run:
+Prerequisites: Node.js 20.x, npm, and Git.
+
+### 1. Clone the repository and enter its root directory
 
 ```bash
-npm ci
-npm ci --prefix backend
-npm ci --prefix frontend
+git clone https://github.com/pennyyuqa/bidshop.git
+cd bidshop
+```
+
+All commands below must be run from this root directory—the directory containing
+`package.json`, `playwright.config.ts`, `backend/`, `frontend/`, and `tests/`.
+
+### 2. Select Node.js 20
+
+This repository includes an `.nvmrc` file so local development and CI use the
+same Node.js major version. If you use `nvm`, run:
+
+```bash
+nvm install
+nvm use
+node --version
+```
+
+The reported version should start with `v20`. If you do not use `nvm`, install
+Node.js 20.x with your preferred version manager or the official installer.
+
+### 3. Install dependencies
+
+```bash
+npm ci                     # Playwright test dependencies
+npm ci --prefix backend    # Express API dependencies
+npm ci --prefix frontend   # React application dependencies
+```
+
+The three commands are required because the test project, backend, and frontend
+each have their own `package.json` and lockfile.
+
+### 4. Install Chromium for Playwright
+
+```bash
 npx playwright install chromium
 ```
 
-Playwright starts the backend and frontend automatically; no separate server
-startup is required.
+On Linux, use `npx playwright install --with-deps chromium` if the required
+system browser dependencies are not already installed.
+
+### 5. Run the tests
+
+Run these commands from the same repository root:
 
 ```bash
 npm test              # run all API and UI tests
@@ -55,6 +92,11 @@ npm run test:ui       # run UI tests only
 npm run test:headed   # run with a visible browser
 npm run test:report   # open the latest HTML report
 ```
+
+Do not start the backend or frontend manually for the automated tests.
+Playwright starts both services and waits for them to become available. Ensure
+ports `4000` and `5173` are free before running the suite so it starts with a
+fresh in-memory application state.
 
 CI also type-checks the backend, builds the frontend, installs the browser, and
 runs the full suite. Failed tests are retried twice, and the HTML report is
